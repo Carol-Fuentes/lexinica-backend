@@ -7,12 +7,12 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Aquí pega la clave API entre comillas
+// Configurar OpenAI con variable de entorno desde Heroku
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,  // Usar la variable de entorno de Heroku
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
-// 🔹 Webhook para Dialogflow
+// 🔹 Webhook para Dialogflow (opcional, si usas Dialogflow)
 app.post('/webhook', async (req, res) => {
   const pregunta = req.body.queryResult?.queryText;
 
@@ -25,11 +25,8 @@ app.post('/webhook', async (req, res) => {
       ],
     });
 
-    const respuesta = completion.choices[0].message.content;
-
-    return res.json({
-      fulfillmentText: respuesta,
-    });
+    const respuesta = completion.choices[0]?.message?.content || "No se pudo generar respuesta.";
+    return res.json({ fulfillmentText: respuesta });
   } catch (error) {
     console.error('Error en /webhook:', error);
     return res.json({
@@ -38,7 +35,7 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
-// 🔹 Endpoint opcional para frontend web
+// 🔹 Endpoint para frontend web
 app.post('/api/chat', async (req, res) => {
   const { pregunta } = req.body;
 
@@ -51,7 +48,8 @@ app.post('/api/chat', async (req, res) => {
       ],
     });
 
-    const respuesta = completion.choices[0].message.content;
+    const respuesta = completion.choices[0]?.message?.content || "No se pudo generar respuesta.";
+    console.log("Respuesta generada:", respuesta); // Log para depuración
     res.json({ respuesta });
   } catch (error) {
     console.error('Error en /api/chat:', error);
@@ -61,5 +59,5 @@ app.post('/api/chat', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
+  console.log(`✅ Servidor corriendo en puerto ${PORT}`);
 });
