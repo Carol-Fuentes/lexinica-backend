@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -9,13 +7,14 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+// Aquí pega la clave API entre comillas
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: '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',
 });
 
-// 🔹 Endpoint para Dialogflow
+// 🔹 Webhook para Dialogflow
 app.post('/webhook', async (req, res) => {
-  const pregunta = req.body.queryResult.queryText;
+  const pregunta = req.body.queryResult?.queryText;
 
   try {
     const completion = await openai.chat.completions.create({
@@ -39,7 +38,7 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
-// 🔹 Endpoint opcional para frontend web (como lo tenías)
+// 🔹 Endpoint opcional para frontend web
 app.post('/api/chat', async (req, res) => {
   const { pregunta } = req.body;
 
