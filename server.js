@@ -9,7 +9,7 @@ app.use(bodyParser.json());
 
 // Aquí pega la clave API entre comillas
 const openai = new OpenAI({
-  apiKey: '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',
+  apiKey: process.env.OPENAI_API_KEY,  // Usar la variable de entorno de Heroku
 });
 
 // 🔹 Webhook para Dialogflow
